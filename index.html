@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Sunu-Idées</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+</head>
+
+<body class="bg-slate-100 min-h-screen flex flex-col">
+
+    <!-- Header  -->
+    <header class="bg-white border-b border-slate-200">
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <div class="flex items-center justify-between h-20">
+
+                <!-- Logo -->
+                <div class="flex items-center gap-4">
+
+                    <div class="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-800">
+                            Sunu-Idées
+                        </h1>
+
+                        <p class="text-slate-500 text-sm">
+                            Boîte à idées collaborative
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Partie droite -->
+                <div class="flex items-center gap-4">
+
+                    <!-- compteur dynamique -->
+                    <div class="bg-slate-100 border border-slate-200 px-5 py-2 rounded-full flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+
+                        <!-- JS : nombre dynamique -->
+                        <span id="ideas-count" class="font-semibold text-slate-700">
+                            
+                        </span>
+                    </div>
+
+                    <button
+                        class="w-10 h-10 rounded-lg hover:bg-slate-100 transition flex items-center justify-center text-slate-500">
+                        <i class="fa-regular fa-bell"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+   
+    <main class="flex-1">
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+               <!-- formulaire -->
+                <aside class="lg:col-span-4">
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sticky top-6">
+
+                        <!-- titre -->
+                        <div class="flex items-start gap-3 mb-6">
+
+                            <div class="text-blue-500 text-xl">
+                                <i class="fa-solid fa-pen"></i>
+                            </div>
+
+                            <div>
+                                <h2 class="text-2xl font-bold text-slate-800">
+                                    Soumettre une idée
+                                </h2>
+
+                                <p class="text-slate-500 mt-1">
+                                    Partagez votre proposition avec la communauté.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <!-- formulaire  -->
+                        <form id="idea-form" class="space-y-5">
+
+                            <!-- titre -->
+                            <div>
+
+                                <label class="block mb-2 font-medium text-slate-700">
+                                    Titre de l'idée
+                                </label>
+
+                                <input type="text" id="titre" placeholder="Ex: Créer un potager partagé..."
+                                    class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500" />
+
+                            </div>
+
+                            <!-- catégorie -->
+                            <div>
+
+                                <label class="block mb-2 font-medium text-slate-700">
+                                    Catégorie
+                                </label>
+
+                                <select id="categorie"
+                                    class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">
+                                        Sélectionner une catégorie
+                                    </option>
+
+                                    <option value="Pédagogie">
+                                        Pédagogie
+                                    </option>
+
+                                    <option value="Événement">
+                                        Événement
+                                    </option>
+
+                                    <option value="Vie de campus">
+                                        Vie de campus
+                                    </option>
+
+                                    <option value="Amélioration technique">
+                                        Amélioration technique
+                                    </option>
+                                </select>
+
+                            </div>
+
+                            <!-- description -->
+                            <div>
+
+                                <label class="block mb-2 font-medium text-slate-700">
+                                    Description détaillée
+                                </label>
+
+                                <textarea id="description" rows="5" placeholder="Décrivez votre idée en détail..."
+                                    class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none resize-none focus:ring-2 focus:ring-blue-500"></textarea>
+
+                            </div>
+
+                            <!-- bouton -->
+                            <button type="submit" id="submit-btn"
+                                class="w-full bg-blue-500 hover:bg-blue-600 transition text-white py-4 rounded-xl font-semibold shadow-md">
+                                <i class="fa-solid fa-paper-plane mr-2"></i>
+                                Publier l'idée
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </aside>
+
+                <!-- idees  -->
+                <section class="lg:col-span-8 space-y-6">
+                    <!-- recherche et filtre  -->
+
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+
+                        <div class="flex flex-col xl:flex-row gap-4 xl:items-center xl:justify-between">
+
+                            <!-- search -->
+                            <div class="relative w-full xl:max-w-md">
+
+                                <i
+                                    class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+
+                                <input type="text" id="search-input" placeholder="Rechercher des idées..."
+                                    class="w-full border border-slate-300 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500" />
+
+                            </div>
+
+                            <!-- filtre catégorie -->
+                            <div class="w-full xl:w-72">
+
+                                <select id="filter-categorie"
+                                    class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-700">
+
+                                    <option value="Toutes">
+                                        Toutes les catégories
+                                    </option>
+
+                                    <option value="Pédagogie">
+                                        Pédagogie
+                                    </option>
+
+                                    <option value="Événement">
+                                        Événement
+                                    </option>
+
+                                    <option value="Vie de campus">
+                                        Vie de campus
+                                    </option>
+
+                                    <option value="Amélioration technique">
+                                        Amélioration technique
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div id="ideas-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
+
+                        <!-- Carte dynamiaque -->
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-10 bg-white border-t border-slate-200">
+
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-sm">
+
+            <p>
+                <i class="fa-solid fa-lightbulb text-blue-500 mr-1"></i>
+                Sunu-Idées © 2026
+            </p>
+
+            <p>
+                On mange du code
+            </p>
+
+        </div>
+
+    </footer>
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
