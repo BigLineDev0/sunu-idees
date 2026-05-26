@@ -51,18 +51,12 @@ sunu-idees/
 ```
 ---
 
-### Lancer le projet
+### Lien du projet deploye 
 
-- Cloner le dépôt GitHub
 ```bash
-git clone <url-du-repo>
-cd sunu-idees
+https://sunu-idees.vercel.app/
 ```
---- 
-
-### Lancer index.html dans le navigateur
---- 
-
+---
 
 ### Auteur
 - Aliou DIALLO
