@@ -1,6 +1,6 @@
 const form = document.getElementById("idea-form");
 
-let todos = [] // tableau todo
+let todos = [] // tableau idees
 let editId;
 
 form.addEventListener("submit", function(e) {
@@ -22,7 +22,7 @@ form.addEventListener("submit", function(e) {
             if (todo.id === editId) {
                 return {...todo, titre, categorie, description}
             }
-            return todos;
+            return todo;
         });
 
         editId = null;
@@ -87,6 +87,7 @@ function afficherNombreIdees() {
     document.getElementById("ideas-count").textContent = `${count} ${count > 1 ? "Idées" : "Idée"}`;
 }
 
+// formater la date
 function formaterDate(date) {
 
     return new Date(date).toLocaleString(
@@ -198,8 +199,15 @@ function afficherTodos(donnees = todos) {
     }
 }
 
-// supprimer une todo
+// supprimer une idee
 function supprimerTodo(id) {
+
+    const confirmation = confirm("Voulez-vous vraiment supprimer cette idée ?");
+
+    // si l'utilisateur clique sur annuler
+    if (!confirmation) {
+        return;
+    }
 
     todos = todos.filter(todo => todo.id !== id);
 
@@ -211,8 +219,7 @@ function supprimerTodo(id) {
 }
 
 // modifier une idee
-
-const modifierTodo = (id) => {
+function modifierTodo (id){
 
     const todo = todos.find(todo => todo.id === id);
 
@@ -220,7 +227,7 @@ const modifierTodo = (id) => {
     document.getElementById("categorie").value = todo.categorie
     document.getElementById("description").value = todo.description
 
-    editId  = id;
+    editId = id;
 
     document.getElementById("submit-btn").textContent = "Modifier l'idée";
 
