@@ -1,3 +1,5 @@
+import { API_KEY } from "./config.js";
+
 const form = document.getElementById("idea-form");
 
 let todos = [] // tableau idees
@@ -291,25 +293,31 @@ async function suggegerCategorie() {
         Description : ${description}
     `;
 
-    const reponse = await fetch("http://localhost:11434/api/generate", 
+    const reponse = await fetch("https://openrouter.ai/api/v1/chat/completions", 
         {
             method: "POST",
             headers: {
+                "Authorization": `Bearer ${API_KEY}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: "mistral",
-                prompt,
-                stream: false
+                model: "google/gemma-4-31b-it:free",
+                messages: [
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ]
             })
         }
     );
 
-    
-
     const data = await reponse.json();
 
-     const categorie = data.response.trim();
+    console.log(data);
+    console.log(reponse.status);
+    
+    const categorie = data.choices[0].message.content.trim();
 
     console.log("Catégorie suggérée :",categorie);
 
@@ -317,7 +325,6 @@ async function suggegerCategorie() {
     
     
 }
-
 
 document
     .getElementById("description")
