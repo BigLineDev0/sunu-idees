@@ -3,6 +3,10 @@ const form = document.getElementById("idea-form");
 let todos = [] // tableau idees
 let editId;
 
+const inputRecherche = document.getElementById("search-input");
+const inputFiltre = document.getElementById("filter-categorie");
+
+
 form.addEventListener("submit", function(e) {
     e.preventDefault(); //empecher le rechargement
 
@@ -76,7 +80,7 @@ const chargerTodos = () => {
 // charger les todos au demarage
 window.addEventListener(
     "DOMContentLoaded",
-    chargerTodos
+    chargerTodos,
 );
 
 // afficher le nombres idees
@@ -233,10 +237,6 @@ function modifierTodo (id){
 
 }
 
-
-const inputRecherche = document.getElementById("search-input");
-const inputFiltre = document.getElementById("filter-categorie");
-
 // filter par categorie et recherche
 const filterTodo = () => {
     const valeurRechercher = inputRecherche.value.toLowerCase();
@@ -267,3 +267,58 @@ inputFiltre.addEventListener(
     "change",
     filterTodo
 );
+
+// Suggeger categorie par l'IA
+async function suggegerCategorie() {
+
+    const titre = document.getElementById("titre").value;
+    const description = document.getElementById("description").value;
+
+    const prompt = `
+        Tu es un classificateur d'idées.
+
+        Catégories :
+
+        - Pédagogie
+        - Événement
+        - Vie de campus
+        - Amélioration technique
+
+        Réponds uniquement avec une catégorie.
+
+        Titre : ${titre}
+
+        Description : ${description}
+    `;
+
+    const reponse = await fetch("http://localhost:11434/api/generate", 
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "mistral",
+                prompt,
+                stream: false
+            })
+        }
+    );
+
+    
+
+    const data = await reponse.json();
+
+     const categorie = data.response.trim();
+
+    console.log("Catégorie suggérée :",categorie);
+
+    document.getElementById("categorie").value = categorie;
+    
+    
+}
+
+
+document
+    .getElementById("description")
+    .addEventListener("blur", suggegerCategorie);
