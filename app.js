@@ -384,7 +384,7 @@ async function suggegerCategorie() {
     const titre = document.getElementById("titre").value;
     const description = document.getElementById("description").value;
 
-    const reponse = await fetch("/api/ai", {
+    const reponse = await fetch("api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ titre, description })
