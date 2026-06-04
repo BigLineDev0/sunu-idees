@@ -1,89 +1,192 @@
-import { API_KEY } from "./config.js";
+// import { API_KEY } from "./config.js";
 
-const form = document.getElementById("idea-form");
+const supabaseUrl = "https://cpkfgakapuhsdybwsbxf.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwa2ZnYWthcHVoc2R5YndzYnhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MDYxMzcsImV4cCI6MjA5NjA4MjEzN30.P54Vgddfw3b5jI5EV_NqHFypWNfzceY3LZlrVEQifcM";
+
 
 let todos = [] // tableau idees
 let editId;
 
+const form = document.getElementById("idea-form");
 const inputRecherche = document.getElementById("search-input");
 const inputFiltre = document.getElementById("filter-categorie");
+const titreInput = document.getElementById("titre");
+const categorieSelect = document.getElementById("categorie");
+const descriptionInput = document.getElementById("description");
+
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 
-form.addEventListener("submit", function(e) {
-    e.preventDefault(); //empecher le rechargement
+//Afficher le message d'erreur et la bordure red
+function setError(element, message) {
 
-    const titre = document.getElementById("titre").value;
-    const categorie = document.getElementById("categorie").value;
-    const description = document.getElementById("description").value;
+    const formControl = element.parentElement;
+    const small = formControl.querySelector("small");
 
-    document.getElementById("submit-btn").textContent = "Publier l'idée";
-
-    if (titre === "" || categorie === "" || description === "") {
-        return alert("Veuillez remplir tous les champs");
+    // Affichage du message
+    if (small) {
+        small.innerText = message;
     }
 
-    // Mode modification
-    if (editId) {
-        todos = todos.map(todo => {
-            if (todo.id === editId) {
-                return {...todo, titre, categorie, description}
-            }
-            return todo;
-        });
+    // Bordure rouge
+    element.classList.remove("border-green-500");
+    element.classList.add("border-red-500");
+}
 
-        editId = null;
+// masquer le message et afficher la bordure green
+function setSuccess(element) {
+
+    const formControl = element.parentElement;
+    const small = formControl.querySelector("small");
+
+    // Affichage du message
+    if (small) {
+        small.innerText = '';
     }
 
-    // Mode d'ajout
-    else{
+    // Bordure verte
+    element.classList.add("border-green-500");
+    element.classList.remove("border-red-500");
+}
 
-        const todo = {
-            'id': Date.now(),
-            titre,
-            categorie,
-            description,
-            date: new Date()
-        }
-        
-        todos.push(todo);
+// Valider le champ titre
+function validerTitre() {
+
+    const value = titreInput.value.trim();
+
+    if (value === "") {
+
+        setError(titreInput, "Le champ titre est obligatoire.");
+
+        return false;
     }
 
-    console.log(todos);
+    if (value.length < 3) {
+
+        setError(titreInput, "Minimum 3 caractères.");
+
+        return false;
+    }
+
+    if (!value.match(/^[a-zA-Z]/)) {
+        setError(titreInput, "Le champ titre doit commence par une lettre.")
+        return false;
+    }
+
+    setSuccess(titreInput);
+    return true;
+
+}
+
+// Validation du champ select categorie
+function validerCategorie() {
      
-    sauvegarderTodos()
+    if (categorieSelect.value === "") {
+        setError(categorieSelect, "Veuillez selectionner une categorie.");
+        return false;
+    }
 
-    afficherNombreIdees()
+    setSuccess(categorieSelect);
+    return true;
+}
 
-    afficherTodos();
+// Validation du champ description
+function validerDescription(){
+    if (descriptionInput.value === "" || descriptionInput.value.length < 10) {
+        setError(descriptionInput, "Le champ description doit contenir au mois 10 caractere.");
+        return false;
+    }
 
-    // vider les champs
+    setSuccess(descriptionInput);
+    return true;
+    
+}
+
+
+form.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    if (!validerForm()) return;
+
+    const titre = titreInput.value;
+    const description = descriptionInput.value;
+    const btn = document.getElementById("submit-btn");
+
+    // Loader clair avec spinner Unicode
+    btn.disabled = true;
+    btn.innerHTML = `<span class="animate-spin inline-block mr-2">
+        <i class="fa-solid fa-spinner"></i>
+        </span> Analyse IA...`;
+
+    let categorie;
+    try {
+        categorie = await suggegerCategorie();
+    } catch (err) {
+        console.error("Erreur IA :", err);
+        // Fallback : garder la catégorie choisie manuellement
+        categorie = categorieSelect.value;
+    } finally {
+        // Toujours rétablir le bouton, même en cas d'erreur
+        btn.disabled = false;
+        btn.innerHTML = editId ? "Modifier l'idée" : "Publier l'idée";
+    }
+
+    categorieSelect.value = categorie;
+
+    if (editId) {
+        const { error } = await supabase
+            .from("ideas")
+            .update({ titre, categorie, description })
+            .eq("id", editId);
+
+        if (error) { console.error(error); return; }
+        editId = null;
+
+    } else {
+        const { data, error } = await supabase
+            .from("ideas")
+            .insert([{ titre, categorie, description }]);
+
+        if (error) { 
+            console.error(error); return; 
+        }
+    }
+
+    await chargerTodos(); // Un seul appel suffit
+
     form.reset();
-    
-    
+    [titreInput, categorieSelect, descriptionInput].forEach(el => {
+        el.classList.remove("border-green-500");
+    });
 });
 
-// sauvegarder dans le localStorage
-const sauvegarderTodos = () => {
-    localStorage.setItem("todos", JSON.stringify(todos));
+// Validation globale
+function validerForm() {
+    const titreValide = validerTitre();
+    // const categorieValide = validerCategorie();
+    const descriptionValide = validerDescription();
+
+    return (titreValide && descriptionValide);
 }
 
 // charger les todos
-const chargerTodos = () => {
-    const donnees = localStorage.getItem("todos");
+async function chargerTodos(){
+    const { data, error } = await supabase
+        .from("ideas")
+        .select("*")
+        .order("date", { ascending: false });
 
-    if (donnees) {
-        todos = JSON.parse(donnees);
+    if(error){
+        console.error(error);
+        return;
     }
+
+    todos = data;
 
     afficherNombreIdees()
     afficherTodos();
 }
 
-// charger les todos au demarage
-window.addEventListener(
-    "DOMContentLoaded",
-    chargerTodos,
-);
 
 // afficher le nombres idees
 function afficherNombreIdees() {
@@ -107,7 +210,6 @@ function formaterDate(date) {
         }
     );
 }
-
 
 // afficher la couleur de la categorie et bordure 
 function getCategoryStyle(categorie) {
@@ -152,6 +254,7 @@ function afficherTodos(donnees = todos) {
     const todoList = document.getElementById("ideas-container");
 
     todoList.innerHTML = "";
+    
 
     if (donnees.length === 0) {
 
@@ -206,7 +309,7 @@ function afficherTodos(donnees = todos) {
 }
 
 // supprimer une idee
-function supprimerTodo(id) {
+async function supprimerTodo(id) {
 
     const confirmation = confirm("Voulez-vous vraiment supprimer cette idée ?");
 
@@ -215,13 +318,18 @@ function supprimerTodo(id) {
         return;
     }
 
-    todos = todos.filter(todo => todo.id !== id);
+    const { error } = await supabase
+        .from("ideas")
+        .delete()
+        .eq("id", id);
 
-    sauvegarderTodos();
+    if (error) {
+        console.error(error);
+        return;
+    }
 
-    afficherNombreIdees()
+    await chargerTodos();
 
-    afficherTodos();
 }
 
 // modifier une idee
@@ -276,56 +384,30 @@ async function suggegerCategorie() {
     const titre = document.getElementById("titre").value;
     const description = document.getElementById("description").value;
 
-    const prompt = `
-        Tu es un classificateur d'idées.
-
-        Catégories :
-
-        - Pédagogie
-        - Événement
-        - Vie de campus
-        - Amélioration technique
-
-        Réponds uniquement avec une catégorie.
-
-        Titre : ${titre}
-
-        Description : ${description}
-    `;
-
-    const reponse = await fetch("https://openrouter.ai/api/v1/chat/completions", 
-        {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${API_KEY}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                model: "google/gemma-4-31b-it:free",
-                messages: [
-                    {
-                        role: "user",
-                        content: prompt
-                    }
-                ]
-            })
-        }
-    );
+    const reponse = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ titre, description })
+    });
 
     const data = await reponse.json();
-
-    console.log(data);
-    console.log(reponse.status);
-    
-    const categorie = data.choices[0].message.content.trim();
-
-    console.log("Catégorie suggérée :",categorie);
-
-    document.getElementById("categorie").value = categorie;
-    
+    return data.categorie;
     
 }
 
-document
-    .getElementById("description")
-    .addEventListener("blur", suggegerCategorie);
+//validation en temps reel
+titreInput.addEventListener("input", validerTitre);
+categorieSelect.addEventListener("change", validerCategorie);
+descriptionInput.addEventListener("input", validerDescription);
+
+// charger les todos au demarage
+window.addEventListener("DOMContentLoaded", async () => {
+    await chargerTodos();
+});
+
+// document
+//     .getElementById("description")
+//     .addEventListener("blur", suggegerCategorie);
+
+window.modifierTodo = modifierTodo;
+window.supprimerTodo = supprimerTodo;

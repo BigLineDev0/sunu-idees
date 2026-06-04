@@ -113,6 +113,7 @@
 
                                 <input type="text" id="titre" placeholder="Ex: Créer un potager partagé..."
                                     class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500" />
+                                <small class="text-red-500 mt-1 block"></small>
 
                             </div>
 
@@ -145,6 +146,7 @@
                                         Amélioration technique
                                     </option>
                                 </select>
+                                <small class="text-red-500 mt-1 block"></small>
 
                             </div>
 
@@ -157,12 +159,13 @@
 
                                 <textarea id="description" rows="5" placeholder="Décrivez votre idée en détail..."
                                     class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none resize-none focus:ring-2 focus:ring-blue-500"></textarea>
+                                <small class="text-red-500 mt-1 block"></small>
 
                             </div>
 
                             <!-- bouton -->
                             <button type="submit" id="submit-btn"
-                                class="w-full bg-blue-500 hover:bg-blue-600 transition text-white py-4 rounded-xl font-semibold shadow-md">
+                                class="w-full bg-blue-500 hover:bg-blue-600 transition text-white py-4 rounded-xl font-semibold shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed">
                                 <i class="fa-solid fa-paper-plane mr-2"></i>
                                 Publier l'idée
                             </button>
@@ -260,6 +263,7 @@
 
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="app.js"></script>
 
 </body>
