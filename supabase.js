@@ -1,8 +1,12 @@
-const supabaseUrl = "https://cpkfgakapuhsdybwsbxf.supabase.co";
+// Import propre via NPM, plus de CDN
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwa2ZnYWthcHVoc2R5YndzYnhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MDYxMzcsImV4cCI6MjA5NjA4MjEzN30.P54Vgddfw3b5jI5EV_NqHFypWNfzceY3LZlrVEQifcM";
+// Variables d'environnement Vite
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
 
-export const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+// Initialisation Supabase
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function getIdeas() {
 

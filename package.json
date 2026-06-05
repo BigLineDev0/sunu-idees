@@ -1,0 +1,30 @@
+{
+  "name": "sunu-idees",
+  "version": "1.0.0",
+  "description": "Sunu-Idées est une application web de boîte à idées collaborative développée en HTML, Tailwind CSS et JavaScript Vanilla.   Elle permet aux utilisateurs d’ajouter, modifier, supprimer, rechercher et filtrer des idées sans rechargement de page grâce à la manipulation dynamique du DOM.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BigLineDev0/sunu-idees.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/BigLineDev0/sunu-idees/issues"
+  },
+  "homepage": "https://github.com/BigLineDev0/sunu-idees#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.107.0"
+  },
+  "devDependencies": {
+    "vite": "^8.0.16"
+  }
+}

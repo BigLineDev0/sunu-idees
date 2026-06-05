@@ -31,8 +31,13 @@ export function validerTitre(input) {
         return false;
     }
 
-    if (value.length < 3) {
+    if (value.length < 5) {
         setError(input, "Minimum 3 caractères");
+        return false;
+    }
+
+    if (!value.match(/^[a-zA-Z]/)) {
+        setError(input, "Titre doit commencé par une lettre.");
         return false;
     }
 
@@ -47,6 +52,10 @@ export function validerDescription(input) {
     if (value.length < 10) {
         setError(input, "Minimum 10 caractères");
         return false;
+    }
+
+    if (value.length > 500) {
+        setError(input, "Maximum 500 caractères");
     }
 
     setSuccess(input);

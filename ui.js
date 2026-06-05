@@ -1,5 +1,6 @@
 import { CATEGORY_STYLES } from "./constants.js";
 
+
 export function getCategoryStyle(categorie) {
 
     return CATEGORY_STYLES[categorie] || {
@@ -25,27 +26,4 @@ export function formaterDate(date) {
 export function afficherNombreIdees(todos) {
 
     document.getElementById("ideas-count").textContent = `${todos.length} ${todos.length > 1 ? "Idées" : "Idée"}`;
-}
-
-
-export async function suggererCategorie(titre, description) {
-
-    const response = await fetch("/api/ai", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            titre,
-            description
-        })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.error);
-    }
-
-    return data.categorie;
 }

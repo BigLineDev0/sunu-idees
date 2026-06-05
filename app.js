@@ -1,6 +1,8 @@
 import { validerTitre, validerDescription } from "./validation.js";
 
-import { afficherNombreIdees, getCategoryStyle, formaterDate, suggererCategorie } from "./ui.js";
+import { afficherNombreIdees, getCategoryStyle, formaterDate } from "./ui.js";
+
+import { suggererCategorie } from "./ai.js";
 
 import { addIdea, getIdeas, updateIdea, deleteIdea } from "./supabase.js";
 
@@ -14,12 +16,23 @@ const titreInput = document.getElementById("titre");
 const categorieSelect = document.getElementById("categorie");
 const descriptionInput = document.getElementById("description");
 const btn = document.getElementById("submit-btn");
+const compteurCaractere = document.getElementById("compteur-Caractere");
+const idees = document.getElementById("ideas-container");
 
 
 form.addEventListener("submit", async function(e) {
     e.preventDefault();
 
     if (!validerForm()) return;
+
+    // const moderation = await modererDescription(descriptionInput.value);
+
+    // if (!moderation.valide) {
+    //     setError(descriptionInput, moderation.message);
+    //     btn.disabled = false;
+    //     btn.textContent = "Publier l'idée";
+    //     return;
+    // }
 
     const titre = titreInput.value;
     const description = descriptionInput.value;
@@ -33,13 +46,19 @@ form.addEventListener("submit", async function(e) {
 
     let categorie;
     try {
-        categorie = await suggererCategorie(titre, description);
+        if (categorieSelect.value === "") {
+            
+            categorie = await suggererCategorie(titre, description);
+        }
+        else{
+            categorie = categorieSelect.value
+        }
     } catch (err) {
         console.error("Erreur IA :", err);
-        //garder la catégorie choisie manuellement
         categorie = categorieSelect.value;
+
     } finally {
-        // Toujours rétablir le bouton, même en cas d'erreur
+        
         btn.disabled = false;
         btn.innerHTML = editId ? "Modifier l'idée" : "Publier l'idée";
     }
@@ -54,14 +73,11 @@ form.addEventListener("submit", async function(e) {
     } else {
         try {
 
-                await addIdea({titre, categorie, description});
-
-                await chargerTodos();
-
-            } catch(error) {
-
-                console.error(error);
-            }
+            await addIdea({titre, categorie, description});
+            
+        } catch(error) {
+            console.error(error);
+        }
     }
 
     await chargerTodos();
@@ -71,18 +87,13 @@ form.addEventListener("submit", async function(e) {
     [titreInput, categorieSelect, descriptionInput].forEach(el => {
         el.classList.remove("border-green-500");
     });
+
+    compteurCaractere.textContent = "500 caractères.";
+    btn.textContent = "Publier l'idée";
 });
 
-// Validation globale
-function validerForm() {
-    const titreValide = validerTitre(titreInput);
-    // const categorieValide = validerCategorie();
-    const descriptionValide = validerDescription(descriptionInput);
 
-    return (titreValide && descriptionValide);
-}
-
-// charger les todos
+// charger les idees depuis supabase
 async function chargerTodos(){
     try {
 
@@ -100,14 +111,11 @@ async function chargerTodos(){
 // Afficher les idees
 function afficherTodos(donnees = todos) {
 
-    const todoList = document.getElementById("ideas-container");
-
-    todoList.innerHTML = "";
+    let html = "";
     
-
     if (donnees.length === 0) {
 
-        todoList.innerHTML = `
+        html = `
             <p>Aucune idée trouvée</p>
         `;
 
@@ -119,7 +127,7 @@ function afficherTodos(donnees = todos) {
 
             const styles = getCategoryStyle(todo.categorie);
 
-            todoList.innerHTML += `
+            html += `
             
                 <div class="bg-white rounded-2xl border-t-4 ${styles.border} p-5 shadow-sm">
 
@@ -154,6 +162,7 @@ function afficherTodos(donnees = todos) {
                 </div>
             `;
         });
+        idees.innerHTML = html
     }
 }
 
@@ -185,13 +194,15 @@ function modifierTodo (id){
 
     const todo = todos.find(todo => todo.id === id);
 
-    document.getElementById("titre").value = todo.titre
-    document.getElementById("categorie").value = todo.categorie
-    document.getElementById("description").value = todo.description
+    if (!todo) return;
+
+    titreInput.value = todo.titre
+    categorieSelect.value = todo.categorie
+    descriptionInput.value = todo.description
 
     editId = id;
 
-    document.getElementById("submit-btn").textContent = "Modifier l'idée";
+    btn.textContent = "Modifier l'idée";
 
 }
 
@@ -202,7 +213,7 @@ const filterTodo = () => {
 
     // filtrage 
     const filtres = todos.filter(todo => {
-        const rechercheCombines = todo.titre.toLowerCase().includes(valeurRechercher) || todo.description.toLowerCase().includes(valeurRechercher);
+        const rechercheCombines = (todo.titre || "").toLowerCase().includes(valeurRechercher) || (todo.description || "").toLowerCase().includes(valeurRechercher);
 
         const filtreParCategorie = filterCategorie === "Toutes" || todo.categorie === filterCategorie;
 
@@ -210,38 +221,42 @@ const filterTodo = () => {
         return rechercheCombines && filtreParCategorie
     });
 
-    afficherNombreIdees(todos)
+    afficherNombreIdees(filtres)
 
     afficherTodos(filtres)
 
 }
 
-// Declencher les evenements
-inputRecherche.addEventListener(
-    "input",
-    filterTodo
-);
+// Validation globale
+function validerForm() {
+    const titreValide = validerTitre(titreInput);
+    // const categorieValide = validerCategorie();
+    const descriptionValide = validerDescription(descriptionInput);
 
-inputFiltre.addEventListener(
-    "change",
-    filterTodo
-);
+    return (titreValide && descriptionValide);
+}
+
+// Declencher les evenements
+inputRecherche.addEventListener("input", filterTodo);
+
+inputFiltre.addEventListener("change", filterTodo);
 
 //validation en temps reel
 titreInput.addEventListener("input", () => {
     validerTitre(titreInput);
 });
 
-// categorieSelect.addEventListener("change", validerCategorie);
-
 descriptionInput.addEventListener("input", () => {
     validerDescription(descriptionInput);
+    const caractereRestant = 500 - descriptionInput.value.length;
+    compteurCaractere.textContent = `${caractereRestant} caractères.`;
 });
 
-// charger les todos au demarage
+// charger les idees au demarage
 window.addEventListener("DOMContentLoaded", async () => {
     await chargerTodos();
 });
 
+// Acces global
 window.modifierTodo = modifierTodo;
 window.supprimerTodo = supprimerTodo;

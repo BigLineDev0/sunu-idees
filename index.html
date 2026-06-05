@@ -159,7 +159,10 @@
 
                                 <textarea id="description" rows="5" placeholder="Décrivez votre idée en détail..."
                                     class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none resize-none focus:ring-2 focus:ring-blue-500"></textarea>
-                                <small class="text-red-500 mt-1 block"></small>
+                                <div class="flex justify-between mt-2">
+                                    <small class="text-red-500 erreur"></small>
+                                    <small id="compteur-Caractere" class="text-slate-500">500 caractères.</small>
+                                </div>
 
                             </div>
 
@@ -263,7 +266,6 @@
 
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="app.js"></script>
 
 </body>
