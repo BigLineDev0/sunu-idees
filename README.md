@@ -3,8 +3,7 @@
 Sunu-Idées est une application web de boîte à idées collaborative développée en HTML, Tailwind CSS et JavaScript Vanilla.  
 Elle permet aux utilisateurs d’ajouter, modifier, supprimer, rechercher et filtrer des idées sans rechargement de page grâce à la manipulation dynamique du DOM.
 
-Les données sont sauvegardées dans le LocalStorage afin de conserver les idées même après la fermeture du navigateur.
-
+Les données sont sauvegardées dans le cloud (supabase) afin de conserver les idées.
 ---
 
 ## Fonctionnalités
@@ -15,9 +14,11 @@ Les données sont sauvegardées dans le LocalStorage afin de conserver les idée
 - Recherche dynamique
 - Filtrage par catégorie
 - Affichage du nombre total d’idées
-- Sauvegarde des données avec LocalStorage
+- Sauvegarde des données avec supabase 
 - Interface responsive
 - Mise à jour du DOM sans rechargement de page
+- Catégorisation automatique et suggestion de categorie avec l'IA
+- Validation des entrees du forumulaire
 
 ---
 
@@ -35,20 +36,9 @@ Les données sont sauvegardées dans le LocalStorage afin de conserver les idée
 - HTML5
 - Tailwind CSS
 - JavaScript ES6+
-- LocalStorage
+- Supabase
+- OpenRouter
 
----
-
-## Structure du projet
-
-```bash
-sunu-idees/
-│
-├── index.html
-├── style.css
-├── app.js
-└── README.md
-```
 ---
 
 ### Lien du projet deploye 
@@ -60,5 +50,3 @@ https://sunu-idees.vercel.app/
 
 ### Auteur
 - Aliou DIALLO
-- Projet réalisé dans le cadre du brief Simplon :
-- "La Boîte à Idées Collaborative (DOM & LocalStorage)"
