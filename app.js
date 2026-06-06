@@ -1,6 +1,6 @@
 import { validerTitre, validerDescription } from "./utils/validation.js";
 
-import { afficherNombreIdees, getCategoryStyle, formaterDate } from "./utils/ui.js";
+import { afficherNombreIdees, getCategoryStyle, formaterDate, afficherToast } from "./utils/ui.js";
 
 import { suggererCategorie } from "./api/openrouter.js";
 
@@ -67,6 +67,7 @@ form.addEventListener("submit", async function(e) {
 
     if (editId) {
         await updateIdea(editId, {titre,categorie,description});
+        afficherToast("Idée modifiée avec succès !");
 
         editId = null;
 
@@ -74,6 +75,7 @@ form.addEventListener("submit", async function(e) {
         try {
 
             await addIdea({titre, categorie, description});
+            afficherToast("Idée publiée avec succès !");
             
         } catch(error) {
             console.error(error);
@@ -112,14 +114,44 @@ async function chargerTodos(){
 function afficherTodos(donnees = todos) {
 
     let html = "";
-    
-    if (donnees.length === 0) {
 
+    if(todos.length === 0){
         html = `
-            <p>Aucune idée trouvée</p>
-        `;
+            <div class="col-span-full flex flex-col items-center justify-center py-16 text-center">
 
-        return;
+                <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                    <i class="fa-regular fa-lightbulb text-2xl text-slate-400"></i>
+                </div>
+
+                <h3 class="text-xl font-semibold text-slate-700 mb-2">
+                    Aucune idée trouvée
+                </h3>
+
+                <p class="text-slate-500 max-w-md">
+                    Aucune idée n'a encore été publiée.
+                </p>
+
+            </div>
+        `;
+    }
+    else if(donnees.length === 0){
+        html = `
+            <div class="col-span-full flex flex-col items-center justify-center py-16 text-center">
+
+                <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                    <i class="fa-regular fa-lightbulb text-2xl text-slate-400"></i>
+                </div>
+
+                <h3 class="text-xl font-semibold text-slate-700 mb-2">
+                    Aucune idée trouvée
+                </h3>
+
+                <p class="text-slate-500 max-w-md">
+                    Aucune proposition ne correspond à votre recherche.
+                </p>
+
+            </div>
+        `;
     }
     else{
 
@@ -162,8 +194,8 @@ function afficherTodos(donnees = todos) {
                 </div>
             `;
         });
-        idees.innerHTML = html
     }
+    idees.innerHTML = html
 }
 
 // supprimer une idee
@@ -179,6 +211,7 @@ async function supprimerTodo(id) {
     try {
 
         await deleteIdea(id);
+        afficherToast("Idée supprimée avec succès !")
 
         await chargerTodos();
 
