@@ -41,9 +41,7 @@ export async function suggererCategorie(titre, description) {
 
     const categorie = data.choices[0].message.content.trim();
 
-    const categorieNettoye = categorie.replace(/\s+/g, " ").trim();
-
-    return categorieNettoye;
+    return categorie.replace(/\s+/g, " ").trim();
  
 }
 

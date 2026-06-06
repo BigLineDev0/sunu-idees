@@ -1,10 +1,10 @@
-import { validerTitre, validerDescription } from "./validation.js";
+import { validerTitre, validerDescription } from "./utils/validation.js";
 
-import { afficherNombreIdees, getCategoryStyle, formaterDate } from "./ui.js";
+import { afficherNombreIdees, getCategoryStyle, formaterDate } from "./utils/ui.js";
 
-import { suggererCategorie } from "./ai.js";
+import { suggererCategorie } from "./api/openrouter.js";
 
-import { addIdea, getIdeas, updateIdea, deleteIdea } from "./supabase.js";
+import { addIdea, getIdeas, updateIdea, deleteIdea } from "./api/supabase.js";
 
 let todos = [] // tableau idees
 let editId;
